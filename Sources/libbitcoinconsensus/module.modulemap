@@ -1,0 +1,4 @@
+module libbitcoinconsensus {
+    umbrella header "libbitcoinconsensus.h"
+    link "libbitcoinconsensus"
+}
