@@ -27,18 +27,23 @@ public struct swiftLibconsensus {
     */
     public static func verifyScript(scriptPubKey: Data, txTo: Data, nIn: UInt32, flags: UInt32) -> (Bool, BitcoinConsensusError) {
 
-        let scriptPubKey = scriptPubKey as NSData
-        let scriptPubKeyBytes = scriptPubKey.bytes.assumingMemoryBound(to: UInt8.self)
-        let scriptPubKeyLen = UInt32(scriptPubKey.count)
-
-        let txTo = txTo as NSData
-        let txToBytes = txTo.bytes.assumingMemoryBound(to: UInt8.self)
-        let txToLen = UInt32(txTo.count)
-
+        let scriptPubKey = pointerAndCount(data: scriptPubKey)
+        let txTo = pointerAndCount(data: txTo)
         var err = bitcoinconsensus_error(rawValue: 0)
 
-        let result = bitcoinconsensus_verify_script(scriptPubKeyBytes, scriptPubKeyLen, txToBytes, txToLen, nIn, flags, &err) == 1
+        let result = bitcoinconsensus_verify_script(scriptPubKey.pointer, scriptPubKey.count, txTo.pointer, txTo.count, nIn, flags, &err) == 1
 
         return (result, BitcoinConsensusError(rawValue: err.rawValue)!)
+    }
+}
+
+extension swiftLibconsensus {
+
+    static func pointerAndCount(data: Data) -> (pointer: UnsafePointer<UInt8>, count: UInt32) {
+
+        let pointer = (data as NSData).bytes.assumingMemoryBound(to: UInt8.self)
+        let count = UInt32(data.count)
+
+        return (pointer, count)
     }
 }
