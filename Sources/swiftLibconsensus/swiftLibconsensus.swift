@@ -35,6 +35,17 @@ public struct swiftLibconsensus {
 
         return (result, BitcoinConsensusError(rawValue: err.rawValue)!)
     }
+
+    public static func verifyScriptWithAmount(scriptPubKey: Data, amount: Int64, txTo: Data, nIn: UInt32, flags: UInt32) -> (Bool, BitcoinConsensusError) {
+
+        let scriptPubKey = pointerAndCount(data: scriptPubKey)
+        let txTo = pointerAndCount(data: txTo)
+        var err = bitcoinconsensus_error(rawValue: 0)
+
+        let result = bitcoinconsensus_verify_script_with_amount(scriptPubKey.pointer, scriptPubKey.count, amount, txTo.pointer, txTo.count, nIn, flags, &err) == 1
+
+        return (result, BitcoinConsensusError(rawValue: err.rawValue)!)
+    }
 }
 
 extension swiftLibconsensus {
